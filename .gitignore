@@ -3,3 +3,6 @@
 
 # confidential
 secrets.py
+
+# python cache files
+__pycache__
