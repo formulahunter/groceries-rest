@@ -3,12 +3,12 @@ from django.db import models
 
 class MarketLocation(models.Model):
 
-    label = models.CharField(max_length=256, null=True)
-    chain = models.CharField(max_length=256)
+    label = models.CharField(max_length=128)
+    chain = models.CharField(max_length=128, null=True)
 
-    addr = models.CharField(max_length=256, null=True)
-    city_name = models.CharField(max_length=128)
-    state_name = models.CharField(max_length=128)
+    addr = models.CharField(max_length=128, null=True)
+    city_name = models.CharField(max_length=64)
+    state_name = models.CharField(max_length=64)
     zip_code = models.CharField(max_length=10, null=True)
 
     tax_rate = models.DecimalField('tax applied to purchases, in %', max_digits=5, decimal_places=3)
