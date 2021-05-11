@@ -1,4 +1,8 @@
 # intellij project directory
 .idea
 
+# confidential
+server_secrets.py
 
+# python cache files
+__pycache__
