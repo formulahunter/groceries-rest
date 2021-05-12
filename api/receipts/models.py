@@ -13,6 +13,9 @@ class MarketLocation(models.Model):
 
     tax_rate = models.DecimalField('tax applied to purchases, in %', max_digits=5, decimal_places=3)
 
+    def __str__(self):
+        return self.chain + ': ' + self.label
+
     class Meta:
         ordering = ['chain', 'label']
 
@@ -21,6 +24,9 @@ class PaymentMethod(models.Model):
 
     name = models.CharField(max_length=64, unique=True)
     card = models.CharField(max_length=4, unique=True, null=True, verbose_name='optional, last 4 digits of card #')
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         ordering = ['name']
@@ -47,6 +53,9 @@ class Receipt(models.Model):
     tax = models.DecimalField('tax charges incurred', max_digits=6, decimal_places=2, null=True)
 
     account = models.ForeignKey(PaymentMethod, on_delete=models.PROTECT, verbose_name='payment method')
+
+    def __str__(self):
+        return str(self.date) + ' @ ' + str(self.location)
 
     class Meta:
         ordering = ['-date', '-time']
