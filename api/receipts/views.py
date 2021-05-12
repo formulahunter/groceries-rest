@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from receipts.models import MarketLocation, PaymentMethod, Receipt
-from receipts.serializers import MarketLocationSerializer, PaymentMethodSerializer, ReceiptSerializer
+from receipts.serializers import MarketLocationSerializer, PaymentMethodSerializer, ReceiptSerializer, ReceiptListSerializer
 
 
 @api_view(['GET'])
@@ -32,3 +32,9 @@ class ReceiptViewSet(viewsets.ModelViewSet):
     queryset = Receipt.objects.all()
     serializer_class = ReceiptSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ReceiptListSerializer
+
+        return ReceiptSerializer

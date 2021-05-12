@@ -18,3 +18,9 @@ class ReceiptSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Receipt
         fields = '__all__'
+
+
+class ReceiptListSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Receipt
+        fields = ['date', 'time', 'location', 'url']
