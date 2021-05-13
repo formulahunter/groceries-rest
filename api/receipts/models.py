@@ -32,6 +32,70 @@ class PaymentMethod(models.Model):
         ordering = ['name']
 
 
+class GroceryDepartment(models.Model):
+
+    name = models.CharField(max_length=32)
+    location = models.ForeignKey(MarketLocation, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['location', 'name']
+
+
+class GroceryItemBrand(models.Model):
+    name = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+class GroceryItem(models.Model):
+    """
+    grocery items represent literal products. they can generally be described
+    by manufacturer, variety, size, etc.
+
+    the unit price paid for a grocery item may vary between locations and
+    over time, and is considered an aspect of an individual purchase (receipt)
+    rather than the product itself (see `ReceiptLineItem`)
+    """
+
+    name = models.CharField(max_length=128)
+    brand = models.ForeignKey(GroceryItemBrand, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return str(self.brand) + self.name
+
+    class Meta:
+        ordering = ['brand', 'name']
+
+
+class GroceryItemVariety(models.Model):
+    item = models.ForeignKey(GroceryItem, on_delete=models.PROTECT)
+    desc = models.CharField(max_length=64, verbose_name='description')
+
+    def __str__(self):
+        return self.desc
+
+    class Meta:
+        ordering = ['item', 'desc']
+
+
+class GroceryItemSize(models.Model):
+    item = models.ForeignKey(GroceryItem, on_delete=models.PROTECT)
+    desc = models.CharField(max_length=32, verbose_name='description of size (incl. unit of measure where appropriate)')
+
+    def __str__(self):
+        return self.desc
+
+    class Meta:
+        ordering = ['item', 'desc']
+
+
 class Receipt(models.Model):
     """
     total balance is required and unambiguous. the other three accounting
@@ -59,3 +123,24 @@ class Receipt(models.Model):
 
     class Meta:
         ordering = ['-date', '-time']
+
+
+class ReceiptLineItem(models.Model):
+
+    receipt = models.ForeignKey(Receipt, on_delete=models.PROTECT)
+    department = models.ForeignKey(GroceryDepartment, on_delete=models.PROTECT)
+
+    item = models.ForeignKey(GroceryItem, on_delete=models.PROTECT)
+    variety = models.ForeignKey(GroceryItemVariety, on_delete=models.PROTECT)
+    size = models.ForeignKey(GroceryItemSize, on_delete=models.PROTECT)
+
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+    quantity = models.DecimalField(max_digits=6, decimal_places=3, default=1.0)
+    units = models.CharField(max_length=2, verbose_name='unit of measure', default='ct')
+    tax_code = models.CharField(max_length=2, verbose_name='character printed next to item name/price, if any')
+
+    def __str__(self):
+        return str(self.item) + ' .. ' + str(self.quantity) + self.units + ' @ ' + str(self.price)
+
+    class Meta:
+        ordering = ['receipt', 'item']
