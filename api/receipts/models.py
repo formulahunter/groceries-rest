@@ -68,7 +68,7 @@ class GroceryItem(models.Model):
     brand = models.ForeignKey(GroceryItemBrand, on_delete=models.PROTECT)
 
     def __str__(self):
-        return str(self.brand) + self.name
+        return str(self.brand) + ' ' + self.name
 
     class Meta:
         ordering = ['brand', 'name']
@@ -138,7 +138,7 @@ class ReceiptLineItem(models.Model):
     variety = models.ForeignKey(GroceryItemVariety, on_delete=models.PROTECT)
     size = models.ForeignKey(GroceryItemSize, on_delete=models.PROTECT)
 
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(verbose_name='unit price', max_digits=6, decimal_places=2)
     quantity = models.DecimalField(max_digits=6, decimal_places=3, default=1.0)
     units = models.CharField(max_length=2, verbose_name='unit of measure', default='ct')
     tax_code = models.CharField(max_length=2, verbose_name='character printed next to item name/price, if any')
