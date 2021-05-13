@@ -87,9 +87,13 @@ class GroceryItemVariety(models.Model):
 
 class GroceryItemSize(models.Model):
     item = models.ForeignKey(GroceryItem, on_delete=models.PROTECT)
-    desc = models.CharField(max_length=32, verbose_name='description of size (incl. unit of measure where appropriate)')
+    quantity = models.DecimalField(verbose_name='quantitative measure of size (if applicable)', max_digits=6, decimal_places=3, null=True)
+    desc = models.CharField(max_length=32, verbose_name='description of size (taken as unit of measure if quantity is given)')
 
     def __str__(self):
+        if self.quantity != None:
+            return str(self.quantity) + self.desc
+
         return self.desc
 
     class Meta:
