@@ -1,0 +1,38 @@
+version: "3.9"
+
+
+services:
+
+  db:
+    build:
+      context: db
+    shm_size: '256m'
+    volumes:
+      - pg_data:/var/lib/postgresql/data      # default data directory per postgres image description on dockerhub
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=psql                # intentionally insecure password for now
+
+  api:
+    build:
+      context: api
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./api:/home/djrf/api
+      - static_volume:/home/djrf/web/staticfiles
+    depends_on:
+      - db
+    env_file:
+      - api/.env.dev
+
+  web:
+    build: web
+    ports:
+      - 80:80
+    depends_on:
+      - api      # service will fail to build if upstream directive in nginx.conf is not a valid network node
+
+
+volumes:
+  pg_data:        # named volume b/c per docker docs they "have several advantages over bind mounts"
+  static_volume:
