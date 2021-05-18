@@ -4,5 +4,8 @@
 # confidential
 server_secrets.py
 
-# python cache files
+# python venv & cache files
+*venv/
 *__pycache__*
+*.pyc
+*.pyo
