@@ -2,7 +2,7 @@
 .idea
 
 # confidential
-server_secrets.py
+docker-secrets/
 
 # python venv & cache files
 *venv/

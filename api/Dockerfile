@@ -17,8 +17,9 @@ RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev \
                        harfbuzz-dev \
                        fribidi-dev
 
-# create the app user
-RUN addgroup -S djrf && adduser -S djrf -G djrf
+# create the app user & associated group with explicit uid/gid for read
+# access to docker secrets (controlled using file permissions)
+RUN addgroup -S -g 101 djrf && adduser -S -G djrf -u 101 djrf
 
 # define directory structure
 ENV HOME=/home/djrf/
@@ -48,7 +49,6 @@ RUN chown -Rc djrf:djrf $HOME
 
 # change to the app user
 USER djrf
-RUN ls -alR `pwd`
 
 # run entrypoint.sh
 ENTRYPOINT ["/home/djrf/entrypoint.sh"]

@@ -7,6 +7,16 @@ services:
     image: formulahunter/groceries_db
     volumes:
       - pg_data:/var/lib/postgresql/data      # default data directory per postgres image description on dockerhub
+    environment:
+      - POSTGRES_USER=postgres
+    secrets:              # see top-level secrets configuration below
+      - source: pg_pass
+        uid: '70'
+        mode: 0400
+      - source: dj_pass   # needed to create the application user
+        uid: '101'
+        mode: 0400
+
 
   api:
     image: formulahunter/groceries_api
@@ -18,6 +28,14 @@ services:
       - db
     env_file:
       - ./api/.env.dev
+    secrets:              # see top-level secrets configuration below
+      - source: dj_pass
+        uid: '101'
+        mode: 0400
+      - source: dj_code
+        uid: '101'
+        mode: 0400
+
 
   web:
     image: formulahunter/groceries_web
@@ -30,3 +48,18 @@ services:
 volumes:
   pg_data:        # named volume b/c per docker docs they "have several advantages over bind mounts"
   static_volume:
+
+
+# secrets in docker swarm are securely managed by a dedicated internal system
+# access must be explicitly granted to each service on an as-needed basis
+# within a given service, file permissions are used to restrict runtime access
+# '70' is the standard uid/gid for 'postgres' user in Alpine per postgres:13.3-alpine source
+# uid/gid '101' assigned to 'djrf' user in api dockerfile
+# mode 0400 sets read-only for file owner (postgres) and no access for any other user
+secrets:
+  pg_pass:
+    file: ./docker-secrets/.pg_pass
+  dj_pass:
+    file: ./docker-secrets/.dj_pass
+  dj_code:
+    file: ./docker-secrets/.dj_code

@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-from server_secrets import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = app_key
+SECRET_KEY = open('/run/secrets/dj_code', mode='r')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,8 +81,8 @@ DATABASES = {
         'HOST': os.environ.get('SQL_HOST', 'db'),
         'PORT': os.environ.get('SQL_PORT', 5432),
         'NAME': 'groceries',
-        'USER': default_database_user,
-        'PASSWORD': default_database_pass,
+        'USER': 'djrf',
+        'PASSWORD': open('/run/secrets/dj_pass', mode='r').read(),
     }
 }
 

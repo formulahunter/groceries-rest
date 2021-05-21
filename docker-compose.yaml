@@ -4,18 +4,21 @@ version: "3.9"
 services:
 
   db:
-    build:
-      context: db
+    build: db
+    image: formulahunter/groceries_db
     shm_size: '256m'
     volumes:
       - pg_data:/var/lib/postgresql/data      # default data directory per postgres image description on dockerhub
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=psql                # intentionally insecure password for now
+      - POSTGRES_PASSWORD_FILE=/run/secrets/pg_pass
+    secrets:      # see top-level secrets configuration below
+      - pg_pass
+      - dj_pass   # needed to create the application user
 
   api:
-    build:
-      context: api
+    build: api
+    image: formulahunter/groceries_api
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./api:/home/djrf/api
@@ -24,9 +27,13 @@ services:
       - db
     env_file:
       - api/.env.dev
+    secrets:      # see top-level secrets configuration below
+      - dj_pass
+      - dj_code
 
   web:
     build: web
+    image: formulahunter/groceries_web
     ports:
       - 80:80
     depends_on:
@@ -36,3 +43,16 @@ services:
 volumes:
   pg_data:        # named volume b/c per docker docs they "have several advantages over bind mounts"
   static_volume:
+
+
+# secrets in docker compose are merely bind mounts, not managed as in docker swarm
+#  -> https://github.com/docker/docker.github.io/issues/9156#issue-473809925
+# setting file permissions is not supported
+# replicated here simply for continuity of build/deploy pipeline (see `docker-stack.yaml`)
+secrets:
+  pg_pass:
+    file: ./docker-secrets/.pg_pass
+  dj_pass:
+    file: ./docker-secrets/.dj_pass
+  dj_code:
+    file: ./docker-secrets/.dj_code
